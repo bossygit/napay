@@ -1,0 +1,20 @@
+napay.content:
+  path: '/notify'
+  defaults:
+    _controller: '\Drupal\napay\Controller\NotifyController::notify'
+  requirements:
+    _permission: 'access content'
+
+napay.order:
+  path: '/nx'
+  defaults:
+    _controller: '\Drupal\napay\Controller\NotifyController::order'
+  requirements:
+    _permission: 'access content'  
+    
+napay.process:
+  path: '/process'
+  defaults:
+    _controller: '\Drupal\napay\Controller\NotifyController::process'
+  requirements:
+    _permission: 'access content'      
