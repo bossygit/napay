@@ -137,6 +137,32 @@
 		  
 	  }
 	  
+	    /**
+   * Download file.
+   *
+   * @param string $filename
+   *   The filename.
+   */
+  protected function download() {
+
+    // Do some file validation here, like checking for extension.
+
+    // File lives in /files/downloads.
+    $uri_prefix = 'private://music/';
+	$filename = 'try_again.mp3';
+
+    $uri = $uri_prefix . $filename;
+
+    $headers = [
+      'Content-Type' => 'audio/mp3', // Would want a condition to check for extension and set Content-Type dynamically
+      'Content-Description' => 'File Download',
+      'Content-Disposition' => 'attachment; filename=' . $filename
+    ];
+
+    // Return and trigger file donwload.
+    return new BinaryFileResponse($uri, 200, $headers, true );
+  }
+	  
 	  protected function createUser($numero){
 	  $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
       $user = \Drupal\user\Entity\User::create();
