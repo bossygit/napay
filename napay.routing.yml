@@ -18,3 +18,10 @@ napay.process:
     _controller: '\Drupal\napay\Controller\NotifyController::process'
   requirements:
     _permission: 'access content'      
+
+napay.download:
+  path: '/dwn'
+  defaults:
+    _controller: '\Drupal\napay\Controller\NotifyController::download'
+  requirements:
+    _permission: 'access content'  
