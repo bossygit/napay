@@ -203,26 +203,44 @@
    *
    */
   public function download() {
-
-    // TODO Get user id
-	// TODO Verify user has send money in notification
-	// TODO Allow download 	
- 
-
-    // File lives in /files/downloads.
+	   
     $uri_prefix = 'private://music/';
 	$filename = 'Flames.mp3';
 
-    $uri = $uri_prefix . $filename;
-
-    $headers = [
+    $uri = $uri_prefix . $filename;  
+	$headers = [
       'Content-Type' => 'audio/mp3', // Would want a condition to check for extension and set Content-Type dynamically
       'Content-Description' => 'File Download',
       'Content-Disposition' => 'attachment; filename=' . $filename
     ];
 
-    // Return and trigger file donwload.
+    // TODO Get user id
+	// TODO Verify user has send money in notification
+	// TODO Allow download 	
+	
+	$user = User::load(\Drupal::currentUser()->id());
+	$name = $user->get('name')->value;
+	$query = \Drupal::entityQuery('node');
+	$query->condition('type', 'notification');
+	$query->condition('field_telephone_number', $name , '=');
+	$query->range(0, 1);
+	$nb_resultats = $query->count()->execute();
+	
+	if($nb_resultats  == 1){
+		 
     return new BinaryFileResponse($uri, 200, $headers, true );
+	}
+	
+	else {
+		
+	}
+
+
+
+
+
+
+
   }
 
 }
