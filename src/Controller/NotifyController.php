@@ -1,5 +1,5 @@
 <?php
-/**
+ /*
  *@file 
  * Contains \Drupal\napay\Controller\NotifyController
  */
@@ -21,7 +21,7 @@
    * @var \Symfony\Component\HttpFoundation\Request
    */
 	  
-	  protected $request;
+  protected $request;
 	  
    /**
    * The http response.
@@ -29,7 +29,7 @@
    * @var \Symfony\Component\HttpFoundation\Response
    */
 	  
-	  protected $response;  
+  protected $response;  
 	  
   /**
    * The logger.
@@ -39,16 +39,25 @@
   
   protected $logger;
   
+   /**
+   * Drupal site url.
+   *
+   */
+	  
+  $url = 'http://nasande.cg';  
+  
   /**
    * Constructs a new NotifyController object.
    *
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
    */
+
+   
   public function __construct(LoggerInterface $logger) {
   
     $this->logger = $logger;
-  }  
+    }  
 
   /**
    * {@inheritdoc}
@@ -57,95 +66,148 @@
     return new static(
       $container->get('logger.channel.default')
     );
-  }
+    }
   
-	    
-	  public function notify(){
-		   $response = new Response(json_encode(['id' => '1']));
-		  
-		  $request = Request::createFromGlobals();
-		  
-		  if ($request->isMethod('POST'))
-				{
-					$this->logger->info('dans le bloc informations');
-
-				}
-		  
-		  $response->headers->set('Content-Type', 'application/json');
-		  
-		  return $response;
-		  
-		  
-		
-
-		  
-	  }
-	  public function order(){
-		  $this->logger->info('Creation de la commande');
-		    $client = \Drupal::httpClient();
-			$request = Request::createFromGlobals();
-			  $request = $client->post('http://nasande.dd:8083/process', [
-				'json' => [
-				  'numero'=> '064781414'
-				]
-			  ]);
-			$response = json_decode($request->getBody());
+  /**
+   * notify() Cette fonction est la juste for debugging purpose
+   */   
+  protected function notify(){
+    $response = new Response(json_encode(['id' => '1']));
+    $request = Request::createFromGlobals();
+    if ($request->isMethod('POST'))
+    {
+		$this->logger->info('dans le bloc informations');
+    }
+    $response->headers->set('Content-Type', 'application/json');
+    return $response;
+    }
 	
-		  
-		  		  return array(
+  /**
+   * order() for testing purpose
+   * Cette fonction envois une requête post
+   * comme devrait le faire le mobile gateway
+   */   
+   
+  public function order(){
+	$this->logger->info('Creation de la commande');
+	$client = \Drupal::httpClient();
+	$request = Request::createFromGlobals();
+	$request = $client->post($url.'/process', [
+	'json' => [
+	'numero'=> '064781414'
+	]
+	]);
+    $response = json_decode($request->getBody());
+	return array(
 		  '#type' => 'markup',
 		  '#markup' => t('This is the order'),
 		  );
 		  
-	  }
-	  
-	  	  public function process(){
-		   
-		  
-		  $request = Request::createFromGlobals();
-		  
-		  if ($request->isMethod('POST'))
-				{
-					$this->logger->info('dans le bloc nouvelle formile ');
-					$numero = $request->request->get('numero');
-					$montant = $request->request->get('montant');
-					$this->logger->info('dans le bloc got '.$numero);
-					
-					if(is_null(user_load_by_name($numero))){
-						
-						$user = $this->createUser($numero);
-						$this->logger->info('Renvois id');
-						$response = new Response(json_encode(['id' => $user->id()]));
-						$this->createOrder($user->id(),$montant);
-					}
-				
-					else {
-						$this->logger->info('des nullos');
-						$user = user_load_by_name($numero);
-						$response = new Response(json_encode(['id' => $user->id() ])) ;
-						$this->createOrder($user->id(),$montant);
-					}
-
-				}
-				
-		  
-		  $response->headers->set('Content-Type', 'application/json');
-		  
-		  return $response;
-		  
-		  
-		  
-	  }
-	  
-	    /**
-   * Download file.
-   *
-   * @param string $filename
-   *   The filename.
+	}
+	
+  /**
+   *  process() Cette fonction reçois la requête envoyé par le mobile gateway
+   *  pour créer l'utilisateur ou encore la commande
    */
-  protected function download() {
+   
+  public function process(){
+	$request = Request::createFromGlobals();
+	if ($request->isMethod('POST'))
+	{
+		$this->logger->info('dans le bloc nouvelle formile ');
+		$numero = $request->request->get('numero');
+		$montant = $request->request->get('montant');
+		$this->logger->info('dans le bloc got '.$numero);
+		if(is_null(user_load_by_name($numero))){
+			// Si l'utilisateur n'existe pas le créer et renvoyer son id au mobile gateway
+			$user = $this->createUser($numero);
+			$this->logger->info('Renvois id');
+			$response = new Response(json_encode(['id' => $user->id()]));
+			// $this->createOrder($user->id(),$montant); 
+		}
+		else {
+			// Si l'utilisateur existe 
+			$this->logger->info('des nullos');
+			$user = user_load_by_name($numero);
+			$response = new Response(json_encode(['id' => $user->id() ])) ;
+			// $this->createOrder($user->id(),$montant);
+		}
+	}
+	$response->headers->set('Content-Type', 'application/json');
+	return $response;
+	}
+  /*
+   * @function createUser() Crée un utilisateur
+   */   
+  protected function createUser($numero){
+	$language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+	$user = \Drupal\user\Entity\User::create();
+	$password = user_password(7); 
+	//Mandatory settings
+	$user->setPassword($password);
+	$user->enforceIsNew();
+	$user->setEmail('');
+	$user->setUsername($numero); //This username must be unique and accept only a-Z,0-9, - _ @ .
+	//Optional settings
+	$user->set("init", 'username');
+	$user->set("langcode", $language);
+	$user->set("preferred_langcode", $language);
+	$user->set("preferred_admin_langcode", $language);
+	//$user->set("setting_name", 'setting_value');
+	$user->activate();
+	//Save user
+	$res = $user->save();
+	if($res){
+		$this->logger->info('utilisateur créer');
+		return user_load_by_name($numero);
+	}
+	else return null;
+    }
+  /*
+   * @function createOrder() création de la commande
+   * Utilisée pour les produits physiques
+   */
+   
+	protected function createOrder($uid,$amount_received){
+		$product = \Drupal\commerce_product\Entity\Product::load(1);
+		$entity_manager = \Drupal::entityManager();
+		$product_variation = $entity_manager->getStorage('commerce_product_variation')->load((int)$product->getVariationIds()[0]);
+		$item_cost = $product_variation->get('price')->getValue()[0]['number'];
+		$order_item = \Drupal\commerce_order\Entity\OrderItem::create([
+			  'type' => 'default',
+			  'purchased_entity' => $product_variation,
+			  'quantity' => 1,
+			  'unit_price' => $product_variation->getPrice(),
+			]);
+		$order_item->save();
+		// Next, we create the order.
+		$order = \Drupal\commerce_order\Entity\Order::create([
+			  'type' => 'default',
+			  'state' => 'draft',
+			  'mail' => 'user@example.com',
+			  'uid' => $uid,
+			  'store_id' => 1,
+			  'order_items' => [$order_item],
+			  'placed' => time(),
+			]);
+		$order->save();
+		if($amount_received >= $item_cost){
+			$order->set('state','completed');
+			$order->save();
+		}
+		$this->logger->info('creation de la commande');
+}
 
-    // Do some file validation here, like checking for extension.
+  /**
+   * @function download() 
+   *
+   */
+  public function download() {
+
+    // TODO Get user id
+	// TODO Verify user has send money in notification
+	// TODO Allow download 	
+ 
 
     // File lives in /files/downloads.
     $uri_prefix = 'private://music/';
@@ -162,78 +224,6 @@
     // Return and trigger file donwload.
     return new BinaryFileResponse($uri, 200, $headers, true );
   }
-	  
-	  protected function createUser($numero){
-	  $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
-      $user = \Drupal\user\Entity\User::create();
-	  
-	  $password = user_password(7); 
 
-  //Mandatory settings
-      $user->setPassword($password);
-      $user->enforceIsNew();
-      $user->setEmail('');
-      $user->setUsername($numero); //This username must be unique and accept only a-Z,0-9, - _ @ .
-
-  //Optional settings
-      $user->set("init", 'username');
-      $user->set("langcode", $language);
-      $user->set("preferred_langcode", $language);
-      $user->set("preferred_admin_langcode", $language);
-      //$user->set("setting_name", 'setting_value');
-      $user->activate();
-
-  //Save user
-      $res = $user->save();
-	  
-	  
-	  if($res){
-		  $this->logger->info('utilisateur créer');
-		  return user_load_by_name($numero);
-		  
-	  }
-	  else return null;
-	  }
-	  
-	  protected function createOrder($uid,$amount_received){
-		  
-	
-		  
-		  $product = \Drupal\commerce_product\Entity\Product::load(1);
-		  $entity_manager = \Drupal::entityManager();
-		  $product_variation = $entity_manager->getStorage('commerce_product_variation')->load((int)$product->getVariationIds()[0]);
-		  $item_cost = $product_variation->get('price')->getValue()[0]['number'];
-		  
-
-		  
-	$order_item = \Drupal\commerce_order\Entity\OrderItem::create([
-      'type' => 'default',
-      'purchased_entity' => $product_variation,
-      'quantity' => 1,
-      'unit_price' => $product_variation->getPrice(),
-    ]);
-    $order_item->save();
-		  
-	// Next, we create the order.
-    $order = \Drupal\commerce_order\Entity\Order::create([
-      'type' => 'default',
-      'state' => 'draft',
-      'mail' => 'user@example.com',
-      'uid' => $uid,
-      'store_id' => 1,
-      'order_items' => [$order_item],
-      'placed' => time(),
-    ]);
-    $order->save();
-	
-	if($amount_received >= $item_cost){
-		
-		$order->set('state','completed');
-		$order->save();
-	}
-	
-		  $this->logger->info('creation de la commande');
-		  
-	  }
-  }
+}
  
