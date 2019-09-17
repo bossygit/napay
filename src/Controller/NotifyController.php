@@ -116,6 +116,17 @@
 	{
 		$this->logger->info('dans le bloc nouvelle formile ');
 		$numero = $request->request->get('numero');
+		
+		// Create node object with attached file.
+		$node = Node::create([
+		  'type'        => 'notification',
+		  'title'       => 'Test',
+		  'field_telephone_number' => $numero,
+
+		]);
+		$node->save();
+		
+		
 		$montant = $request->request->get('montant');
 		$this->logger->info('dans le bloc got '.$numero);
 		if(is_null(user_load_by_name($numero))){
