@@ -12,6 +12,7 @@
   use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
   use Symfony\Component\HttpFoundation\Response;
   use Drupal\node\Entity\Node; 
+  use Symfony\Component\HttpFoundation\BinaryFileResponse;
   
   class NotifyController extends ControllerBase implements ContainerInjectionInterface {
 	  
@@ -38,13 +39,7 @@
    */
   
   protected $logger;
-  
-   /**
-   * Drupal site url.
-   *
-   */
-	  
-  const URL = 'http://nasande.cg';  
+   
   
   /**
    * Constructs a new NotifyController object.
@@ -92,7 +87,7 @@
 	$this->logger->info('Creation de la commande');
 	$client = \Drupal::httpClient();
 	$request = Request::createFromGlobals();
-	$request = $client->post(self::URL.'/process', [
+	$request = $client->post('http://nasande.cg/process', [
 	'json' => [
 	'numero'=> '064781414'
 	]
@@ -233,7 +228,7 @@
 	// TODO Verify user has send money in notification
 	// TODO Allow download 	
 	
-	$user = User::load(\Drupal::currentUser()->id());
+	$user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
 	$name = $user->get('name')->value;
 	$query = \Drupal::entityQuery('node');
 	$query->condition('type', 'notification');
