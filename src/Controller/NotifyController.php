@@ -129,7 +129,7 @@
 		
 		$montant = $request->request->get('montant');
 		$this->logger->info('dans le bloc got '.$numero);
-		if(is_null(user_load_by_name($numero))){
+		if(is_bool(user_load_by_name($numero))){
 			// Si l'utilisateur n'existe pas le créer et renvoyer son id au mobile gateway
 			$user = $this->createUser($numero);
 			$this->logger->info('Renvois id');
@@ -142,6 +142,7 @@
 			$user = user_load_by_name($numero);
 			$response = new Response(json_encode(['id' => $user->id() ])) ;
 			// $this->createOrder($user->id(),$montant);
+			is_
 		}
 	}
 	$response->headers->set('Content-Type', 'application/json');
