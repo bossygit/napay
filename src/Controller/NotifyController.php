@@ -134,7 +134,7 @@
 			// Si l'utilisateur existe 
 			$this->logger->info('des nullos');
 			$user = user_load_by_name($numero);
-			$response = new Response(json_encode(['id' => $user->id(),'numero' => $numero ])) ;
+			$response = new Response(json_encode(['id' => $user->id(),'numero' => $numero ],'success' => 2)) ;
 			// $this->createOrder($user->id(),$montant);
 			$response->headers->set('Content-Type', 'application/json');
 			return $response;
@@ -166,7 +166,7 @@
 	$res = $user->save();
 	if($res){
 		$this->logger->info('utilisateur créer');
-		$response =  new Response(json_encode(['id' => $user->id(),'pass' => $password,'numero' => $numero]));
+		$response =  new Response(json_encode(['id' => $user->id(),'pass' => $password,'numero' => $numero,'success' => 1]));
 		$response->headers->set('Content-Type', 'application/json');
 		return $response;
 			
