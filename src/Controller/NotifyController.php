@@ -119,7 +119,7 @@
 		  'type'        => 'notification',
 		  'title'       => 'Test',
 		  'body'        => $body,
-		  'field_amount' => $montant
+		  'field_amount' => $montant,
 		  'field_telephone_number' => $numero,
 
 		]);
