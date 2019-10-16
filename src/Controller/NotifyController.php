@@ -138,14 +138,19 @@
 			// Si l'utilisateur existe 
 			$this->logger->info('des nullos');
 			$user = user_load_by_name($numero);
-			$response = new Response(json_encode(['id' => $user->id(),'numero' => $numero ],'success' => 2)) ;
+			$response = new Response(json_encode(['id' => $user->id(),'numero' => $numero ,'success' => 2])) ;
 			// $this->createOrder($user->id(),$montant);
 			$response->headers->set('Content-Type', 'application/json');
 			return $response;
 			
 		}
 	}
-
+        else {
+           		$response = new Response(json_encode(['success' => 3])) ;
+			// $this->createOrder($user->id(),$montant);
+			$response->headers->set('Content-Type', 'application/json');
+			return $response; 
+        }
 	}
   /*
    * @function createUser() Crée un utilisateur
@@ -246,7 +251,9 @@
 	}
 	
 	else {
-		
+	    return [
+      '#markup' => $this->t('Pas de fichier disponible.'),
+    ];	
 	}
 
 
