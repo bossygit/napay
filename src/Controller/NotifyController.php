@@ -182,41 +182,7 @@
 	}
 	else return null;
     }
-  /*
-   * @function createOrder() création de la commande
-   * Utilisée pour les produits physiques
-  
-   
-	protected function createOrder($uid,$amount_received){
-		$product = \Drupal\commerce_product\Entity\Product::load(1);
-		$entity_manager = \Drupal::entityManager();
-		$product_variation = $entity_manager->getStorage('commerce_product_variation')->load((int)$product->getVariationIds()[0]);
-		$item_cost = $product_variation->get('price')->getValue()[0]['number'];
-		$order_item = \Drupal\commerce_order\Entity\OrderItem::create([
-			  'type' => 'default',
-			  'purchased_entity' => $product_variation,
-			  'quantity' => 1,
-			  'unit_price' => $product_variation->getPrice(),
-			]);
-		$order_item->save();
-		// Next, we create the order.
-		$order = \Drupal\commerce_order\Entity\Order::create([
-			  'type' => 'default',
-			  'state' => 'draft',
-			  'mail' => 'user@example.com',
-			  'uid' => $uid,
-			  'store_id' => 1,
-			  'order_items' => [$order_item],
-			  'placed' => time(),
-			]);
-		$order->save();
-		if($amount_received >= $item_cost){
-			$order->set('state','completed');
-			$order->save();
-		}
-		$this->logger->info('creation de la commande');
-}
- */
+
 
   /**
    * @function download() 
