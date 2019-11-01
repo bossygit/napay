@@ -185,7 +185,7 @@
   /*
    * @function createOrder() création de la commande
    * Utilisée pour les produits physiques
-   */
+  
    
 	protected function createOrder($uid,$amount_received){
 		$product = \Drupal\commerce_product\Entity\Product::load(1);
@@ -216,6 +216,7 @@
 		}
 		$this->logger->info('creation de la commande');
 }
+ */
 
   /**
    * @function download() 
