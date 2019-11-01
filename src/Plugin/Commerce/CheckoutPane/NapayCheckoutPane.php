@@ -1,12 +1,12 @@
 <?php
-
+/**
 namespace Drupal\napay\Plugin\Commerce\CheckoutPane;
 
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
 use Drupal\Core\Form\FormStateInterface;
 
-
+ */
 /**
  * @CommerceCheckoutPane(
  *  id = "napay_checkout_pane",
@@ -16,6 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
  *  wrapper_element = "string",
  * )
  */
+/**
 class NapayCheckoutPane extends CheckoutPaneBase implements  CheckoutPaneInterface {
 
 
@@ -23,7 +24,7 @@ class NapayCheckoutPane extends CheckoutPaneBase implements  CheckoutPaneInterfa
 
       /**
       * {@inheritdoc}
-      */
+     
       public function buildPaneForm(array $pane_form, FormStateInterface $form_state, array &$complete_form) {
         // Builds the pane form.
 
@@ -38,16 +39,17 @@ return $pane_form;
       }
       /**
       * {@inheritdoc}
-      */
+    
       public function validatePaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
         // Validates the pane form.
       }
       /**
       * {@inheritdoc}
-      */
+     
       public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
         // Handles the submission of an pane form.
       }
 
 
 }
+ */
