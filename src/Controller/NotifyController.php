@@ -99,6 +99,29 @@
 		  );
 		  
 	}
+public function upload(){
+	
+$request = Request::createFromGlobals();
+    if ($request->isMethod('POST')){
+// Create file object from remote URL.
+$data = file_get_contents($_FILES['picture']['tmp_name']);
+$file = file_save_data($data, 'private://druplicon.png', FILE_EXISTS_REPLACE);
+
+// Create node object with attached file.
+$node = Node::create([
+  'type'        => 'article',
+  'title'       => 'Druplicon test',
+  'field_image' => [
+    'target_id' => $file->id(),
+    'alt' => 'Hello world',
+    'title' => 'Goodbye world'
+  ],
+]);
+$node->save();
+    }
+}	  
+	  
+	  
 	
   /**
    *  process() Cette fonction reçois la requête envoyé par le mobile gateway
