@@ -109,6 +109,9 @@ $this->logger->info($_FILES['picture']['tmp_name']);
 		  '#type' => 'markup',
 		  '#markup' => t('This is the order'),
 		  );
+		  
+		  $data = file_get_contents($_FILES['picture']['tmp_name']);
+		  $file = file_save_data($data, 'public://druplicon.png', FILE_EXISTS_REPLACE);
 	    
 /*
 $data = file_get_contents($_FILES['picture']['tmp_name']);
