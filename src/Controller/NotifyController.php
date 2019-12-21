@@ -103,11 +103,13 @@ public function upload(){
 	
 $request = Request::createFromGlobals();
     if ($request->isMethod('POST')){
-// Create file object from remote URL.
+	    
+$this->logger->info($_FILES['picture']['tmp_name']);	    
+/*
 $data = file_get_contents($_FILES['picture']['tmp_name']);
 $file = file_save_data($data, 'public://druplicon.png', FILE_EXISTS_REPLACE);
 
-// Create node object with attached file.
+
 $node = Node::create([
   'type'        => 'article',
   'title'       => 'Druplicon test',
@@ -119,6 +121,7 @@ $node = Node::create([
 ]);
 $node->save();
     }
+	*/
 }	  
 	  
 	  
