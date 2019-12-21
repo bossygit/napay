@@ -109,7 +109,7 @@ $this->logger->info($_FILES['picture']['tmp_name']);
          $fileBag = new \Symfony\Component\HttpFoundation\FileBag($_FILES);
          /** @var $file Symfony\Component\HttpFoundation\File\UploadedFile */
          $file = $fileBag->get('picture');
-         $file->move("public://", $file->getClientOriginalName());
+         $file->move('public://', $file->getClientOriginalName());
      } catch (Exception $e) {
 		 
 		 $response =  new Response(json_encode(array('success' => false, 'message' => $e->getMessage())));
