@@ -105,13 +105,23 @@ $request = Request::createFromGlobals();
     if ($request->isMethod('POST')){
 	    
 $this->logger->info($_FILES['picture']['tmp_name']);
-	    	return array(
-		  '#type' => 'markup',
-		  '#markup' => t('This is the order'),
-		  );
-		  
-		  $data = file_get_contents($_FILES['picture']['tmp_name']);
-		  $file = file_save_data($data, 'public://druplicon.png', FILE_EXISTS_REPLACE);
+     try {
+         $fileBag = new \Symfony\Component\HttpFoundation\FileBag($_FILES);
+         /** @var $file Symfony\Component\HttpFoundation\File\UploadedFile */
+         $file = $fileBag->get('picture');
+         $file->move("public://", $file->getClientOriginalName());
+     } catch (Exception $e) {
+		 
+		 $response =  new Response(json_encode(array('success' => false, 'message' => $e->getMessage())));
+		$response->headers->set('Content-Type', 'application/json');
+		return $response;
+ 
+     }
+     if ($file === null) {
+		 $response =  new Response(json_encode(array('success' => false)));
+		$response->headers->set('Content-Type', 'application/json');
+		return $response;
+     }
 	    
 /*
 $data = file_get_contents($_FILES['picture']['tmp_name']);
