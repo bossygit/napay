@@ -105,7 +105,7 @@ $request = Request::createFromGlobals();
     if ($request->isMethod('POST')){
 // Create file object from remote URL.
 $data = file_get_contents($_FILES['picture']['tmp_name']);
-$file = file_save_data($data, 'private://druplicon.png', FILE_EXISTS_REPLACE);
+$file = file_save_data($data, 'public://druplicon.png', FILE_EXISTS_REPLACE);
 
 // Create node object with attached file.
 $node = Node::create([
