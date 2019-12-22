@@ -109,7 +109,8 @@ $this->logger->info($_FILES['picture']['tmp_name']);
          $fileBag = new \Symfony\Component\HttpFoundation\FileBag($_FILES);
          /** @var $file Symfony\Component\HttpFoundation\File\UploadedFile */
          $file = $fileBag->get('picture');
-         $file->move('/sites/default/files', $file->getClientOriginalName());
+         $target = $file->move('sites/default/files', $file->getClientOriginalName());
+      
      } catch (Exception $e) {
 		 
 		 $response =  new Response(json_encode(array('success' => false, 'message' => $e->getMessage())));
@@ -121,14 +122,15 @@ $this->logger->info($_FILES['picture']['tmp_name']);
 		 $response =  new Response(json_encode(array('success' => false)));
 		$response->headers->set('Content-Type', 'application/json');
 		return $response;
+		
+		
      }
-	    
-/*
-$data = file_get_contents($_FILES['picture']['tmp_name']);
-$file = file_save_data($data, 'public://druplicon.png', FILE_EXISTS_REPLACE);
-
-
-$node = Node::create([
+	 $kombo = "/sites/default/files/".$file->getClientOriginalName();
+     $data = file_get_contents("http://nasande.cg".$kombo);
+     $file = file_save_data($data, "public://".$file->getClientOriginalName(), FILE_EXISTS_REPLACE);
+	 
+	 
+	 $node = Node::create([
   'type'        => 'article',
   'title'       => 'Druplicon test',
   'field_image' => [
@@ -138,11 +140,23 @@ $node = Node::create([
   ],
 ]);
 $node->save();
+     
+		$response =  new Response(json_encode(array('success' => true)));
+		$response->headers->set('Content-Type', 'application/json');
+		return $response;
+    }
+     	
+	    
+/*
+
+
+
+
     }
 	*/
 }	  
 	  
-  }	  
+    
 	
   /**
    *  process() Cette fonction reçois la requête envoyé par le mobile gateway
