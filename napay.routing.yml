@@ -19,11 +19,19 @@ napay.process:
   requirements:
     _permission: 'access content'      
 
-napay.upload:
-  path: '/upload'
+    
+napay.fichier:
+  path: '/fichier'
   defaults:
-    _controller: '\Drupal\napay\Controller\NotifyController::upload'
+    _controller: '\Drupal\napay\Controller\NotifyController::fichier'
   requirements:
     _permission: 'access content'
+    
+napay.download:
+  path: '/download'
+  defaults:
+    _controller: '\Drupal\napay\Controller\NotifyController::download'
+  requirements:
+    _permission: 'access content'    
     
  
