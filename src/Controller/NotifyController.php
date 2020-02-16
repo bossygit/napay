@@ -99,63 +99,37 @@
 		  );
 		  
 	}
-public function upload(){
-	
-$request = Request::createFromGlobals();
-    if ($request->isMethod('POST')){
-	    
-$this->logger->info($_FILES['picture']['tmp_name']);
-     try {
-         $fileBag = new \Symfony\Component\HttpFoundation\FileBag($_FILES);
-         /** @var $file Symfony\Component\HttpFoundation\File\UploadedFile */
-         $file = $fileBag->get('picture');
-         $target = $file->move('sites/default/files', $file->getClientOriginalName());
-      
-     } catch (Exception $e) {
-		 
-		 $response =  new Response(json_encode(array('success' => false, 'message' => $e->getMessage())));
-		$response->headers->set('Content-Type', 'application/json');
-		return $response;
- 
-     }
-     if ($file === null) {
-		 $response =  new Response(json_encode(array('success' => false)));
-		$response->headers->set('Content-Type', 'application/json');
-		return $response;
-		
-		
-     }
-	 $kombo = "/sites/default/files/".$file->getClientOriginalName();
-     $data = file_get_contents("http://nasande.cg".$kombo);
-     $file = file_save_data($data, "public://".$file->getClientOriginalName(), FILE_EXISTS_REPLACE);
-	 
-	 
-	 $node = Node::create([
-  'type'        => 'article',
-  'title'       => 'Druplicon test',
-  'field_image' => [
-    'target_id' => $file->id(),
-    'alt' => 'Hello world',
-    'title' => 'Goodbye world'
-  ],
-]);
-$node->save();
-     
-		$response =  new Response(json_encode(array('success' => true)));
-		$response->headers->set('Content-Type', 'application/json');
-		return $response;
-    }
-     	
-	    
-/*
-
-
-
-
-    }
-	*/
-}	  
 	  
+    public function fichier(){
+        
+    $request = Request::createFromGlobals();
+	if ($request->isMethod('POST'))
+	{
+		$this->logger->info('dans le bloc de creation de fichier');
+		$numero = $request->request->get('numero');
+		$title = $request->request->get('titre');
+		$id = $request->request->get('id');
+		$userid = $request->request->get('userId');
+	
+		
+		// Create node object with attached file.
+		$node = Node::create([
+		  'type'        => 'fichier',
+		  'title'       => $title,
+		  'field_id_fichier' => $id,
+		  'field_numero' => $numero,
+		  'field_id_user' => $userid,
+
+
+		]);
+		$node->save();
+		
+		$response = new Response(json_encode(['success' => 1]));
+		$response->headers->set('Content-Type', 'application/json');
+		
+		return $response;
+    }
+    }
     
 	
   /**
@@ -171,14 +145,16 @@ $node->save();
 		$numero = $request->request->get('numero');
 		$body = $request->request->get('body');
 		$montant = $request->request->get('montant');
+		$userid = $request->request->get('user_id');
 		
 		// Create node object with attached file.
 		$node = Node::create([
 		  'type'        => 'notification',
-		  'title'       => 'Test',
+		  'title'       => $montant." de ".$numero,
 		  'body'        => $body,
 		  'field_amount' => $montant,
 		  'field_telephone_number' => $numero,
+		  'field_user_id' => $userid,
 
 		]);
 		$node->save();
@@ -196,7 +172,7 @@ $node->save();
 			// Si l'utilisateur existe 
 			$this->logger->info('des nullos');
 			$user = user_load_by_name($numero);
-			$response = new Response(json_encode(['id' => $user->id(),'numero' => $numero ,'success' => 2])) ;
+			$response = new Response(json_encode(['id' => "".$user->id(),'numero' => $numero ,'success' => 2])) ;
 			// $this->createOrder($user->id(),$montant);
 			$response->headers->set('Content-Type', 'application/json');
 			return $response;
@@ -247,9 +223,20 @@ $node->save();
    *
    */
   public function download() {
+      
+        $fid = \Drupal::request()->query->get('q');
+        $this->logger->info("id fichier " + $fid);
+      
+        $file =  \Drupal\file\Entity\File::load($fid);
+        
+        $url_fichier = $file->getFileUri();
+        
+        $this->logger->info("Url fichier " + $url_fichier);
+        
+        $filename = basename($url_fichier);  
 	   
-    $uri_prefix = 'private://music/';
-	$filename = 'Flames.mp3';
+    //$uri_prefix = 'private://music/';
+	//$filename = 'Flames.mp3';
 
     $uri = $uri_prefix . $filename;  
 	$headers = [
@@ -272,7 +259,7 @@ $node->save();
 	
 	if($nb_resultats  == 1){
 		 
-    return new BinaryFileResponse($uri, 200, $headers, true );
+    return new BinaryFileResponse($url_fichier, 200, $headers, true );
 	}
 	
 	else {
